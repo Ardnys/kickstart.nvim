@@ -194,6 +194,10 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+-- HERE IS MY CUSTOM COLORSCHEME
+-- it doesn't look good making a color scheme after my username does it
+vim.cmd 'colorscheme ardnys'
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -240,6 +244,24 @@ require('lazy').setup({
   --
   --  This is equivalent to:
   --    require('Comment').setup({})
+  --
+  --    I ADD MY PLUGINS HERE
+  {
+    'mrcjkb/rustaceanvim',
+    version = '^4', -- Recommended
+    lazy = false, -- This plugin is already lazy
+  },
+  {
+    'MeanderingProgrammer/markdown.nvim',
+    name = 'render-markdown', -- Only needed if you have another plugin named markdown.nvim
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter', -- Mandatory
+      'nvim-tree/nvim-web-devicons', -- Optional but recommended
+    },
+    config = function()
+      require('render-markdown').setup {}
+    end,
+  },
 
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
@@ -553,19 +575,53 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
-        gopls = {
-          settings = {
-            gopls = {
-              analyses = {
-                unusedparams = true,
-              },
-              staticcheck = true,
-              completeUnimported = true,
-              usePlaceholders = true,
-            },
+        clangd = {
+          keys = {
+            { '<leader>ch', '<cmd>ClangdSwitchSourceHeader<cr>', desc = 'Switch Source/Header (C/C++)' },
+          },
+          root_dir = function(fname)
+            return require('lspconfig.util').root_pattern(
+              'Makefile',
+              'configure.ac',
+              'configure.in',
+              'config.h.in',
+              'meson.build',
+              'meson_options.txt',
+              'build.ninja'
+            )(fname) or require('lspconfig.util').root_pattern('compile_commands.json', 'compile_flags.txt')(fname) or require('lspconfig.util').find_git_ancestor(
+              fname
+            )
+          end,
+          capabilities = {
+            offsetEncoding = { 'utf-16' },
+          },
+          cmd = {
+            'clangd',
+            '--background-index',
+            '--clang-tidy',
+            '--header-insertion=iwyu',
+            '--completion-style=detailed',
+            '--function-arg-placeholders',
+            '--fallback-style=llvm',
+          },
+          init_options = {
+            usePlaceholders = true,
+            completeUnimported = true,
+            clangdFileStatus = true,
           },
         },
+        -- gopls = {
+        --   settings = {
+        --     gopls = {
+        --       analyses = {
+        --         unusedparams = true,
+        --       },
+        --       staticcheck = true,
+        --       completeUnimported = true,
+        --       usePlaceholders = true,
+        --     },
+        --   },
+        -- },
         pylsp = {
           settings = {
             pylsp = {
@@ -584,7 +640,25 @@ require('lazy').setup({
             },
           },
         },
-        -- rust_analyzer = {},
+        ocamllsp = {
+          cmd = {
+            'ocamllsp',
+          },
+          filetypes = {
+            'ocaml',
+            'menhir',
+            'ocamlinterface',
+            'ocamllex',
+            'reason',
+            'dune',
+          },
+          root_dir = function(fname)
+            return require('lspconfig.util').root_pattern('*.opam', 'esy.json', 'package.json', '.git', 'dune-project', 'dune-workspace')(fname)
+              or require('lspconfig.util').root_pattern('compile_commands.json', 'compile_flags.txt')(fname)
+              or require('lspconfig.util').find_git_ancestor(fname)
+          end,
+        },
+        -- rust_analyzer = {}
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -795,10 +869,10 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      -- vim.cmd.colorscheme 'tokyonight-night'
 
       -- You can configure highlights by doing something like:
-      vim.cmd.hi 'Comment gui=none'
+      -- vim.cmd.hi 'Comment gui=none'
     end,
   },
 
