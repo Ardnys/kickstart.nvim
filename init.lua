@@ -166,8 +166,8 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.api.nvim_set_keymap('i', 'kj', '<Esc>', {})
 
 -- Diagnostic keymaps
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
+vim.keymap.set('n', '[d', '<cmd>lua vim.diagnostic.jump({ count = 1, float = true })<CR>', { desc = 'Go to previous [D]iagnostic message' })
+vim.keymap.set('n', ']d', '<cmd>lua vim.diagnostic.jump({ count = -1, float = true })<CR>', { desc = 'Go to next [D]iagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
@@ -250,6 +250,38 @@ require('lazy').setup({
     'mrcjkb/rustaceanvim',
     version = '^4', -- Recommended
     lazy = false, -- This plugin is already lazy
+    server = {
+      on_attach = function(_, bufnr)
+        vim.keymap.set('n', '<leader>ca', function()
+          vim.cmd.RustLsp 'codeAction'
+        end, { desc = 'Code Action', buffer = bufnr })
+        -- vim.keymap.set('n', '<leader>dr', function()
+        --   vim.cmd.RustLsp 'debuggables'
+        -- end, { desc = 'Rust Debuggables', buffer = bufnr })
+      end,
+      default_settings = {
+        -- rust-analyzer language server configuration
+        ['rust-analyzer'] = {
+          cargo = {
+            allFeatures = true,
+            loadOutDirsFromCheck = true,
+            buildScripts = {
+              enable = true,
+            },
+          },
+          -- Add clippy lints for Rust.
+          checkOnSave = true,
+          procMacro = {
+            enable = true,
+            ignored = {
+              ['async-trait'] = { 'async_trait' },
+              ['napi-derive'] = { 'napi' },
+              ['async-recursion'] = { 'async_recursion' },
+            },
+          },
+        },
+      },
+    },
   },
   {
     'MeanderingProgrammer/markdown.nvim',
