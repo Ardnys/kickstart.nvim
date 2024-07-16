@@ -245,56 +245,6 @@ require('lazy').setup({
   --  This is equivalent to:
   --    require('Comment').setup({})
   --
-  --    I ADD MY PLUGINS HERE
-  {
-    'mrcjkb/rustaceanvim',
-    version = '^4', -- Recommended
-    lazy = false, -- This plugin is already lazy
-    server = {
-      on_attach = function(_, bufnr)
-        vim.keymap.set('n', '<leader>ca', function()
-          vim.cmd.RustLsp 'codeAction'
-        end, { desc = 'Code Action', buffer = bufnr })
-        -- vim.keymap.set('n', '<leader>dr', function()
-        --   vim.cmd.RustLsp 'debuggables'
-        -- end, { desc = 'Rust Debuggables', buffer = bufnr })
-      end,
-      default_settings = {
-        -- rust-analyzer language server configuration
-        ['rust-analyzer'] = {
-          cargo = {
-            allFeatures = true,
-            loadOutDirsFromCheck = true,
-            buildScripts = {
-              enable = true,
-            },
-          },
-          -- Add clippy lints for Rust.
-          checkOnSave = true,
-          procMacro = {
-            enable = true,
-            ignored = {
-              ['async-trait'] = { 'async_trait' },
-              ['napi-derive'] = { 'napi' },
-              ['async-recursion'] = { 'async_recursion' },
-            },
-          },
-        },
-      },
-    },
-  },
-  {
-    'MeanderingProgrammer/markdown.nvim',
-    name = 'render-markdown', -- Only needed if you have another plugin named markdown.nvim
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter', -- Mandatory
-      'nvim-tree/nvim-web-devicons', -- Optional but recommended
-    },
-    config = function()
-      require('render-markdown').setup {}
-    end,
-  },
-
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 
@@ -1000,7 +950,7 @@ require('lazy').setup({
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
