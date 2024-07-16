@@ -879,6 +879,16 @@ require('lazy').setup({
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
       require('mini.pairs').setup {}
+      -- basic file system manipulations
+      require('mini.files').setup {
+        options = {
+          use_as_default_explorer = false,
+        },
+      }
+
+      vim.keymap.set('n', '<leader>n', function()
+        MiniFiles.open(vim.api.nvim_buf_get_name(0), true)
+      end, { desc = 'Open MiniFiles buffer' })
 
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
