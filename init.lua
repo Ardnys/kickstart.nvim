@@ -199,6 +199,16 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 -- it doesn't look good making a color scheme after my username does it
 vim.cmd 'colorscheme ardnys'
 
+-- Workaround for "Buffer <url> newer than edits"
+vim.lsp.util.apply_text_document_edit = function(text_document_edit, index, offset_encoding)
+  local text_document = text_document_edit.textDocument
+  local bufnr = vim.uri_to_bufnr(text_document.uri)
+  if offset_encoding == nil then
+    vim.notify_once('apply_text_document_edit must be called with valid offset_encoding', vim.log.levels.WARN)
+  end
+  vim.lsp.util.apply_text_edits(text_document_edit.edits, bufnr, offset_encoding)
+end
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -732,6 +742,10 @@ require('lazy').setup({
         -- But for many setups, the LSP (`tsserver`) will work just fine
         ts_ls = {},
         html = {},
+        -- racket = {
+        --   cmd = { 'racket', '--lib', 'racket-langserver' },
+        --   filetypes = { 'racket', 'scheme' },
+        -- },
         --
 
         lua_ls = {
@@ -1007,7 +1021,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'java', 'rust', 'python' },
+      ensure_installed = { 'bash', 'c', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'java', 'rust', 'python', 'racket' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
